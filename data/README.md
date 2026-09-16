@@ -52,3 +52,30 @@ error.
 | `two_year_recid` | binary | **target** -- was this person rearrested within two years? | `0` = no, `1` = yes |
 
 Source: derived from [propublica/compas-analysis](https://github.com/propublica/compas-analysis) (the data behind the "Machine Bias" investigation). Personally-identifying columns (name, date of birth, case numbers, charge descriptions) were removed.
+
+20260671 Matilde Rodrigues Caleiras 
+
+Run: 20260916_120811
+Model: logistic_regression  params={'max_iter': 1000}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.678
+Test accuracy:  0.678
+Gap (train - test): -0.000
+
+
+Run: 20260916_122724
+Model: decision_tree  params={'max_depth': 5}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.680
+Test accuracy:  0.668
+Gap (train - test): +0.012
+
+Conclusions: 
+
+Logistic Regression outperforms the Decision Tree with higher test accuracy (0.678 vs 0.668).
+Generalization is perfect for Logistic Regression (gap: 0.000), whereas the Decision Tree shows minor overfitting (gap: +0.012).
+So, in conclusion logistic regression is the better model due to superior accuracy and stability.
