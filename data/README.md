@@ -55,6 +55,8 @@ Source: derived from [propublica/compas-analysis](https://github.com/propublica/
 
 20260671 Matilde Rodrigues Caleiras 
 
+-> CLASS - WEEK 2
+
 Run: 20260916_120811
 Model: logistic_regression  params={'max_iter': 1000}
 Test size: 0.2  random_state: 42
@@ -79,3 +81,35 @@ Conclusions:
 Logistic Regression outperforms the Decision Tree with higher test accuracy (0.678 vs 0.668).
 Generalization is perfect for Logistic Regression (gap: 0.000), whereas the Decision Tree shows minor overfitting (gap: +0.012).
 So, in conclusion logistic regression is the better model due to superior accuracy and stability.
+
+-> CLASS - WEEK 3
+
+Run: 20260923_173415
+Model: logistic_regression  params={'max_iter': 1000}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.678
+Test accuracy:  0.655
+Gap (train - test): +0.023
+
+
+Run: 20260923_173748
+Model: decision_tree  params={'max_depth': 5}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.691
+Test accuracy:  0.642
+Gap (train - test): +0.049
+
+Conclusions: 
+
+Model Comparison (Post-Cleaning):
+   - Logistic Regression outperformed the Decision Tree across all metrics post-cleaning, achieving higher test accuracy (0.655 vs. 0.642) and demonstrating superior generalization capability.
+   - Logistic Regression showed better stability with a lower generalization gap (+0.023), whereas the Decision Tree displayed a higher discrepancy between train and test metrics (+0.049), indicating a mild tendency toward overfitting, likely due to tree depth complexity (max_depth=5).
+   - So, in conclusion, Logistic Regression provides a more robust, stable, and interpretable baseline model compared to Decision Tree constrained at max_depth=5.
+
+Impact of Data Cleaning (Week 2 vs. Week 3):
+   - Test accuracy dropped slightly across both models (Logistic Regression: 0.678 to  0.655; and Decision Tree: 0.668 to 0.642). This performance adjustment suggests that the cleaning pipeline effectively removed noisy instances or redundant observations from the raw dataset. 
+   - The Decision Tree showed higher sensitivity to the pipeline updates, with its train-test gap increasing from +0.012 to +0.049. In contrast, Logistic Regression maintained a smaller generalization gap (+0.023), reaffirming its superior robustness and consistency as a baseline classifier for this dataset.
