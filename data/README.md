@@ -82,6 +82,8 @@ Logistic Regression outperforms the Decision Tree with higher test accuracy (0.6
 Generalization is perfect for Logistic Regression (gap: 0.000), whereas the Decision Tree shows minor overfitting (gap: +0.012).
 So, in conclusion logistic regression is the better model due to superior accuracy and stability.
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 -> CLASS - WEEK 3
 
 Run: 20260923_173415
@@ -113,3 +115,77 @@ Model Comparison (Post-Cleaning):
 Impact of Data Cleaning (Week 2 vs. Week 3):
    - Test accuracy dropped slightly across both models (Logistic Regression: 0.678 to  0.655; and Decision Tree: 0.668 to 0.642). This performance adjustment suggests that the cleaning pipeline effectively removed noisy instances or redundant observations from the raw dataset. 
    - The Decision Tree showed higher sensitivity to the pipeline updates, with its train-test gap increasing from +0.012 to +0.049. In contrast, Logistic Regression maintained a smaller generalization gap (+0.023), reaffirming its superior robustness and consistency as a baseline classifier for this dataset.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-> CLASS - WEEK 4
+
+Run: 20260930_153547
+Model: logistic_regression  params={'max_iter': 1000}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.678
+Test accuracy:  0.674
+Gap (train - test): +0.004
+
+Run: 20260930_153815
+Model: decision_tree  params={'max_depth': 5}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.685
+Test accuracy:  0.678
+Gap (train - test): +0.006
+
+Run: 20260930_154304
+Model: random_forest  params={'n_estimators': 300, 'random_state': 42, 'n_jobs': -1}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.721
+Test accuracy:  0.644
+Gap (train - test): +0.078
+
+Run: 20260930_154827
+Model: dummy  params={'strategy': 'most_frequent'}
+Test size: 0.2  random_state: 42
+============================================================
+
+Train accuracy: 0.549
+Test accuracy:  0.550
+Gap (train - test): -0.000
+
+Conclusions: 
+
+Model Comparison (Post-Preprocessing):
+   - The dummy baseline yields a 55% validation accuracy by predicting the majority
+   class, which all parameterized models successfully outperform, proving effective
+   feature learning post-preprocessing.
+   - Logistic Regression (67.4%) and Decision Tree (67.8%) achieve the highest
+   validation performance, both demonstrating strong generalization with minimal
+   train-validation gaps (+0.004 and +0.006) and no overfitting.
+   - Random Forest scores the highest train accuracy (72.1%) but drops to 64.4% on
+   validation, where an unconstrained depth causes a +0.078 gap due to memorizing
+   training noise.
+   - This comparison highlights the trade-off between top validation score and model
+   robustness; while Decision Tree achieves marginally higher accuracy (67.8%),
+   Logistic Regression (67.4%) is, for me, selected as the overall preferred model due to its
+   superior stability (+0.004 gap) and lower risk of overfitting.
+
+Impact of Preprocessing (Week 3 vs. Week 4):
+   - Comparing Week 3 (data cleaning only) to Week 4 (with preprocessing), we can observe
+   a clear performance gain across both evaluated models (Logistic Regression and Decision Tree).
+   - About the Logistic Regression, adding scaling, encoding, and imputation we managed 
+   to increase test accuracy from 65.5% to 67.4% (+1.9%) while drastically reducing the 
+   train-test gap from +0.023 to +0.004, confirming that linear models heavily benefit 
+   from structured feature preprocessing.
+   - The Decision Tree showed an even larger gain in test accuracy, rising from 64.2%
+   to 67.8% (+3.6%), while its generalization gap dropped from +0.049 to +0.006,
+   proving that robust preprocessing effectively mitigated its earlier overfitting.
+   - So, in conclusion, while Logistic Regression was the clear superior model post-cleaning 
+   in Week 3, the Week 4 preprocessing pipeline elevated both models to comparable top-tier
+   performance (~67.4%-67.8%), eliminating previous instability and validating the
+   pipeline's impact on generalization.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
