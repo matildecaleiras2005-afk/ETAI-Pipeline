@@ -22,7 +22,6 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.preprocessing import (
     OneHotEncoder, OrdinalEncoder, TargetEncoder, StandardScaler, MinMaxScaler, RobustScaler,
 )
-from src.model import build_model
 from category_encoders import CountEncoder
 from sklearn.model_selection import train_test_split
 
@@ -230,7 +229,17 @@ def split_dev_test(X, y, extras, test_size: float, random_state: int):
     )
     return X_dev, X_test, y_dev, y_test, extras_dev, extras_test
 
-def make_pipeline(preprocessing_config=None):
-    # exactly what main.py builds: Pipeline([("prep", build_preprocessor(...)), ("model", build_model(...))])
-    return Pipeline([("prep", build_preprocessor(preprocessing_config)),
-                     ("model", build_model(config["model"]))])
+def add_engineered_features(df):
+    """
+    Since we don't have the variable juvenile_total we have to sum the juvenile counts 
+    """
+    df = df.copy()
+
+    # Feature 1: Indicador binário de histórico severo 
+    total_offenses = df["priors_count"] + df["juv_fel_count"] + df["juv_misd_count"] + df["juv_other_count"]
+    df["high_priors_flag"] = (total_offenses > 5).astype(int)
+
+    # Feature 2: Rácio de carga criminal ponderada (crimes graves na juventude pesam o dobro, ajustado pela idade)
+    df["weighted_criminal_load"] = (df["juv_fel_count"] * 2 + df["priors_count"]) / (df["age"] + 1)
+
+    return df

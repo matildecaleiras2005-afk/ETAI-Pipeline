@@ -159,33 +159,78 @@ Gap (train - test): -0.000
 Conclusions: 
 
 Model Comparison (Post-Preprocessing):
-   - The dummy baseline yields a 55% validation accuracy by predicting the majority
-   class, which all parameterized models successfully outperform, proving effective
-   feature learning post-preprocessing.
-   - Logistic Regression (67.4%) and Decision Tree (67.8%) achieve the highest
-   validation performance, both demonstrating strong generalization with minimal
-   train-validation gaps (+0.004 and +0.006) and no overfitting.
-   - Random Forest scores the highest train accuracy (72.1%) but drops to 64.4% on
-   validation, where an unconstrained depth causes a +0.078 gap due to memorizing
-   training noise.
-   - This comparison highlights the trade-off between top validation score and model
-   robustness; while Decision Tree achieves marginally higher accuracy (67.8%),
-   Logistic Regression (67.4%) is, for me, selected as the overall preferred model due to its
-   superior stability (+0.004 gap) and lower risk of overfitting.
+   - The dummy baseline yields a 55% validation accuracy by predicting the majority class, which all parameterized models successfully outperform, proving effective feature learning post-preprocessing.
+   - Logistic Regression (67.4%) and Decision Tree (67.8%) achieve the highest validation performance, both demonstrating strong generalization with minimal train-validation gaps (+0.004 and +0.006) and no overfitting.
+   - Random Forest scores the highest train accuracy (72.1%) but drops to 64.4% on validation, where an unconstrained depth causes a +0.078 gap due to memorizing training noise.
+   - This comparison highlights the trade-off between top validation score and model robustness; while Decision Tree achieves marginally higher accuracy (67.8%), Logistic Regression (67.4%) is, for me, selected as the overall preferred model due to its superior stability (+0.004 gap) and lower risk of overfitting.
 
 Impact of Preprocessing (Week 3 vs. Week 4):
-   - Comparing Week 3 (data cleaning only) to Week 4 (with preprocessing), we can observe
-   a clear performance gain across both evaluated models (Logistic Regression and Decision Tree).
-   - About the Logistic Regression, adding scaling, encoding, and imputation we managed 
-   to increase test accuracy from 65.5% to 67.4% (+1.9%) while drastically reducing the 
-   train-test gap from +0.023 to +0.004, confirming that linear models heavily benefit 
-   from structured feature preprocessing.
-   - The Decision Tree showed an even larger gain in test accuracy, rising from 64.2%
-   to 67.8% (+3.6%), while its generalization gap dropped from +0.049 to +0.006,
-   proving that robust preprocessing effectively mitigated its earlier overfitting.
-   - So, in conclusion, while Logistic Regression was the clear superior model post-cleaning 
-   in Week 3, the Week 4 preprocessing pipeline elevated both models to comparable top-tier
-   performance (~67.4%-67.8%), eliminating previous instability and validating the
-   pipeline's impact on generalization.
+   - Comparing Week 3 (data cleaning only) to Week 4 (with preprocessing), we can observe a clear performance gain across both evaluated models (Logistic Regression and Decision Tree).
+   - About the Logistic Regression, adding scaling, encoding, and imputation we managed to increase test accuracy from 65.5% to 67.4% (+1.9%) while drastically reducing the train-test gap from +0.023 to +0.004, confirming that linear models heavily benefit from structured feature preprocessing.
+   - The Decision Tree showed an even larger gain in test accuracy, rising from 64.2% to 67.8% (+3.6%), while its generalization gap dropped from +0.049 to +0.006, proving that robust preprocessing effectively mitigated its earlier overfitting.
+   - So, in conclusion, while Logistic Regression was the clear superior model post-cleaning in Week 3, the Week 4 preprocessing pipeline elevated both models to comparable top-tier performance (~67.4%-67.8%), eliminating previous instability and validating the pipeline's impact on generalization.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-> CLASS - WEEK 5 (last week that was not evaluated)
+
+| Model | Default: CV mean ± std | Tuned: nested CV mean ± std | Tuning score (best trial) | Optimism | Chosen hyperparameters |
+| --- | --- | --- | --- | --- | --- |
+| Logistic regression | 0.672 ± 0.013 | 0.673 ± 0.016 | 0.678 | +0.002 | {'model__C': 0.0715}` |
+| Decision tree | 0.674 ± 0.018 | 0.672 ± 0.017 | 0.680 | +0.002 | {'model__criterion': 'gini', 'model__max_depth': 9, 'model__min_samples_leaf': 95} |
+| Random forest | 0.650 ± 0.018 | 0.681 ± 0.015 | 0.683 | +0.000 | {'model__max_depth': 29, 'model__max_features': 'sqrt', 'model__min_samples_leaf': 63} |
+
+Conclusions: 
+
+- Hyperparameter tuning provided significant performance gains for Random Forest, raising its honest nested CV validation accuracy from 0.650 to 0.681 (+3.1 percentage points) and eliminating its overfitting gap (from +0.083 to +0.008). In contrast, Logistic Regression (0.672 to 0.673) and Decision Tree (0.674 to 0.672) showed minimal changes that were smaller than the fold-to-fold standard deviations (between 0.013 - 0.017).
+
+- So, tuning successfully altered model selection, elevating Random Forest to become the best model with an honest validation score of 0.681 (compared to 0.672 - 0.673 for the linear and simple tree baselines). I decided to report the honest nested CV score of 0.681 rather than the optimistic best trial score of 0.683 to ensure an unbiased estimate of generalization performance on unseen test data.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-> CLASS - WEEK 6 
+
+PART A: Week 5 Results + New Models' Results (Oblique RF and AdaBoost)
+
+| Model | Default: CV mean ± std (gap) | Tuned: nested CV mean ± std (gap) | Tuning score (best trial) | Chosen hyperparameters |
+|---|---|---|---|---|
+| Logistic regression | 0.672 ± 0.013 (+0.003) | 0.673 ± 0.016 (+0.004) | 0.678 | {'model__C': 0.0715} |
+| Decision tree | 0.674 ± 0.018 (+0.011) | 0.672 ± 0.017 (+0.013) | 0.680 | {'model__criterion': 'gini', 'model__max_depth': 9, 'model__min_samples_leaf': 95} |
+| Random forest | 0.650 ± 0.018 (+0.083) | 0.681 ± 0.015 (+0.008) | 0.683 | {'model__max_depth': 29, 'model__max_features': 'sqrt', 'model__min_samples_leaf': 63} |
+| Oblique random forest | 0.648 ± 0.012 (+0.114) | 0.680 ± 0.011 (+0.008) | 0.684 | {'model__estimator__project__n_components': 5, 'model__estimator__tree__max_depth': 6, 'model__estimator__tree__min_samples_leaf': 3} |
+| AdaBoost | 0.669 ± 0.013 (+0.006) | 0.682 ± 0.017 (+0.004) | 0.684 | {'model__estimator__max_depth': 4, 'model__learning_rate': 0.025, 'model__n_estimators': 220} |
+
+Conclusions:
+
+- I would choose AdaBoost as my primary model, as it achieved the highest honest nested CV validation score of 0.682 (followed by Random Forest at 0.681 and Oblique RF at 0.680), though its lead over simpler models like Logistic Regression and Decision Tree (0.672–0.673) is small and well within the fold-to-fold standard deviations (~0.011 - 0.017).
+
+- The chosen hyperparameters align with each model's theoretical framework: AdaBoost selected relatively shallow trees (max_depth: 4) to combine weak learners sequentially without overfitting, while Random Forest utilized deeper trees (max_depth: 29) constrained by a large leaf size (min_samples_leaf: 63) to reduce variance through bagging.
+
+- As in week 5, for the selected model (AdaBoost), I prefer using the honest nested CV score of 0.682 rather than the optimistic whole-dataset tuning score of 0.684, as it gives a much more reliable picture of its true performance on new data.
+
+PART B: Challenge 1 Results 
+
+Note: The engineered features (high_priors_flag and weighted_criminal_load) are computed deterministically prior to data splitting, entirely preventing any form of data leakage.
+
+| Model | Default: CV mean ± std | Tuned: nested CV mean ± std | Tuning score (best trial) | Optimism | Chosen hyperparameters |
+|---|---|---|---|---|---|
+| Random Forest (Without FE) | 0.650 ± 0.018 | 0.681 ± 0.015 | 0.683 | +0.000 | {'model__max_depth': 29, 'model__min_samples_leaf': 63, 'model__max_features': 'sqrt'} |
+| Random Forest (With FE) | 0.646 ± 0.017 | 0.681 ± 0.013 | 0.682 | +0.000 | {'model__max_depth': 26, 'model__min_samples_leaf': 28, 'model__max_features': 'sqrt'} |
+
+| Model | Default: CV mean ± std | Tuned: nested CV mean ± std | Tuning score (best trial) | Optimism | Chosen hyperparameters |
+|---|---|---|---|---|---|
+| AdaBoost (Without FE) | 0.669 ± 0.013 | 0.682 ± 0.017 | 0.684 | -0.000 | {'model_estimator_max_depth': 4, 'model_n_estimators': 220, 'model_learning_rate': 0.025} |
+| AdaBoost (With FE) | 0.673 ± 0.015 | 0.682 ± 0.012 | 0.683 | -0.001 | {'model_estimator_max_depth': 4, 'model_n_estimators': 140, 'model_learning_rate': 0.152} |
+
+| Model | Default: CV mean ± std | Tuned: nested CV mean ± std | Tuning score (best trial) | Optimism | Chosen hyperparameters |
+|---|---|---|---|---|---|
+| Logistic Regression (Without FE) | 0.672 ± 0.013 | 0.673 ± 0.016 | 0.678 | +0.002 | {'model_C': 0.0715} |
+| Logistic Regression (With FE) | 0.675 ± 0.016 | 0.673 ± 0.014 | 0.676 | +0.001 | {'model_C': 0.1586} |
+
+Conclusions:
+
+- Across all three model families, feature engineering yielded no significant performance gains that exceeded the fold-to-fold standard deviation (between 0.012–0.017), meaning no model family truly "gained" in terms of final nested CV accuracy. 
+
+- Instead, tree-based models maintained stable scores while optimizing internal structures and efficiency (more balanced depths/leafs for RF, fewer estimators for AdaBoost), while the linear model only benefited from a more relaxed regularization parameter (C).
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
