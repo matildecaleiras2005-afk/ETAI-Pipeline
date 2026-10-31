@@ -261,6 +261,5 @@ Conclusions:
 
 - I chose roc-auc as the selection metric because it evaluates the "model's overall discriminative ability across all classification thresholds without requiring a fixed decision threshold". This makes it robust against class imbalance and great for comparing how well different models predict recidivism in the COMPAS dataset.
 
-- The best-performing model was tuned hist_gradient_boosting with an roc-auc of 0.727. Hyperparameter tuning allowed tree-based models and ensembles to capture more complex non-linear patterns, outperforming linear baselines and their respective untuned versions.
-
+- The best-performing model was tuned hist_gradient_boosting with an roc-auc of 0.727 (std 0.015). While linear baselines like Logistic Regression remained the same (0.719), ensemble and tree-based architectures experienced performance gains, most notably the Random Forest variants, which jumped from untuned baselines of (0.684-0.687) up to 0.726. These results demonstrate that tuning enabled tree ensembles to successfully capture complex, non-linear risk patterns in the COMPAS data, outperforming linear alternatives while maintaining low cross-validation variance.
 
