@@ -234,3 +234,33 @@ Conclusions:
 - Instead, tree-based models maintained stable scores while optimizing internal structures and efficiency (more balanced depths/leafs for RF, fewer estimators for AdaBoost), while the linear model only benefited from a more relaxed regularization parameter (C).
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-> CLASS - WEEK 7
+
+Scoreboard (runs on the same data and metric; best first)
+            run                  model  tuned encoder scaler  roc_auc   std  untuned  floor
+20261031_111747 hist_gradient_boosting   True  target robust    0.727 0.015    0.718  0.500
+20261031_110924      gradient_boosting   True  target robust    0.726 0.015    0.726  0.500
+20261031_110909      gradient_boosting  False  target robust    0.726 0.015    0.726  0.500
+20261031_105948               adaboost   True  target robust    0.726 0.013    0.722  0.500
+20261031_103032  oblique_random_forest   True  target robust    0.726 0.012    0.684  0.500
+20261031_101532          random_forest   True  target robust    0.726 0.015    0.687  0.500
+20261031_105932               adaboost  False  target robust    0.722 0.016    0.722  0.500
+20261031_095546    logistic_regression  False  target robust    0.719 0.013    0.719  0.500
+20261031_100007    logistic_regression   True  target robust    0.719 0.013    0.719  0.500
+20261031_111723 hist_gradient_boosting  False  target robust    0.718 0.018    0.718  0.500
+20261031_100945          decision_tree   True  target robust    0.716 0.013    0.709  0.500
+20261031_112331            naive_bayes   True  target robust    0.710 0.011    0.696  0.500
+20261031_100917          decision_tree  False  target robust    0.709 0.012    0.709  0.500
+20261031_112307            naive_bayes  False  target robust    0.696 0.012    0.696  0.500
+20261031_101420          random_forest  False  target robust    0.687 0.017    0.687  0.500
+20261031_102904  oblique_random_forest  False  target robust    0.684 0.016    0.684  0.500
+20261031_094917                  dummy  False  target robust    0.500 0.000    0.500  0.500
+
+Conclusions:
+
+- I chose roc-auc as the selection metric because it evaluates the "model's overall discriminative ability across all classification thresholds without requiring a fixed decision threshold". This makes it robust against class imbalance and great for comparing how well different models predict recidivism in the COMPAS dataset.
+
+- The best-performing model was tuned hist_gradient_boosting with an roc-auc of 0.727. Hyperparameter tuning allowed tree-based models and ensembles to capture more complex non-linear patterns, outperforming linear baselines and their respective untuned versions.
+
+
