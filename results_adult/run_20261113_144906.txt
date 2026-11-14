@@ -1,0 +1,105 @@
+Run: 20261113_144906
+Model: adaboost  params={'n_estimators': 100, 'random_state': 42}
+Preprocessing: encoder=target  scaler=robust
+CV: 5 stratified folds  shuffle=True  random_state=42
+Metrics: ['accuracy', 'balanced_accuracy', 'precision', 'recall', 'f1', 'fbeta_2', 'roc_auc', 'average_precision']  selection metric: roc_auc
+Feature selection: VoteSelector, min_votes=2 (before tuning)
+Tuning: Optuna, 30 trials x 5 folds, nested CV  random_state=42
+Locked test set: size=0.2  random_state=42  (not evaluated)
+============================================================
+
+Hyperparameters from config.yaml: {'n_estimators': 100, 'random_state': 42}
+
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation    gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.907       0.909 -0.002     0.859              0.769      0.763   0.596 0.669    0.623    0.909              0.787
+    2  0.906       0.897  0.009     0.834              0.733      0.698   0.540 0.609    0.566    0.897              0.746
+    3  0.909       0.900  0.010     0.851              0.749      0.757   0.554 0.640    0.585    0.900              0.767
+    4  0.905       0.915 -0.010     0.859              0.766      0.768   0.589 0.667    0.618    0.915              0.788
+    5  0.912       0.883  0.029     0.843              0.743      0.731   0.549 0.627    0.577    0.883              0.734
+
+                   mean   std
+accuracy          0.849 0.011
+balanced_accuracy 0.752 0.015
+precision         0.744 0.029
+recall            0.565 0.025
+f1                0.642 0.026
+fbeta_2           0.594 0.025
+roc_auc           0.901 0.012
+average_precision 0.764 0.024
+
+roc_auc: train-validation gap mean = +0.007
+
+No-model floor (dummy, same folds): roc_auc = 0.500
+
+Nested cross-validation (the tuning procedure, estimated honestly) (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation    gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision  inner_best  model__estimator__max_depth  model__n_estimators  model__learning_rate  select__min_votes
+    1  0.920       0.914  0.007     0.871              0.796      0.773   0.652 0.707    0.673    0.914              0.808       0.904                            4                  316                 0.228                  1
+    2  0.930       0.912  0.018     0.853              0.762      0.741   0.589 0.656    0.614    0.912              0.790       0.907                            5                  395                 0.150                  2
+    3  0.932       0.905  0.027     0.860              0.765      0.777   0.582 0.665    0.613    0.905              0.786       0.910                            6                  354                 0.078                  1
+    4  0.922       0.922 -0.000     0.870              0.781      0.799   0.610 0.692    0.640    0.922              0.817       0.903                            5                  399                 0.049                  2
+    5  0.921       0.890  0.031     0.851              0.758      0.742   0.580 0.651    0.606    0.890              0.763       0.910                            3                  349                 0.291                  2
+
+                   mean   std
+accuracy          0.861 0.009
+balanced_accuracy 0.772 0.016
+precision         0.766 0.025
+recall            0.602 0.030
+f1                0.674 0.024
+fbeta_2           0.629 0.028
+roc_auc           0.909 0.012
+average_precision 0.793 0.021
+
+roc_auc: train-validation gap mean = +0.017
+
+Tuning on the whole development set (30 Optuna trials, metric: roc_auc)
+Best hyperparameters: {'model__estimator__max_depth': 7, 'model__n_estimators': 319, 'model__learning_rate': 0.19528448815032, 'select__min_votes': 2}
+Best mean CV score:   0.909  (the maximum over all trials -- optimistic)
+
+Top 5 trials:
+ trial  mean roc_auc  model__estimator__max_depth  model__learning_rate  model__n_estimators  select__min_votes   std
+    27         0.909                            7                 0.195                  319                  2 0.007
+    26         0.909                            7                 0.093                  210                  2 0.011
+    17         0.909                            6                 0.202                  171                  2 0.009
+    20         0.908                            4                 0.305                  253                  1 0.011
+    14         0.908                            5                 0.517                  339                  1 0.009
+
+Optimism check (nested CV):
+  tuning score inside the outer folds (inner_best) mean = 0.907
+  honest score on the outer folds (validation)     mean = 0.909
+  optimism = -0.002   -> report the honest one
+
+Out-of-fold predictions, development set (threshold 0.5):
+
+        predicted 0  predicted 1
+true 0         4300          264
+true 1          571          865
+
+              precision    recall  f1-score   support
+
+           0       0.88      0.94      0.91      4564
+           1       0.77      0.60      0.67      1436
+
+    accuracy                           0.86      6000
+   macro avg       0.82      0.77      0.79      6000
+weighted avg       0.85      0.86      0.85      6000
+
+False positive rate by sex (development set, out-of-fold)
+(share of people who did NOT reoffend, but were predicted to)
+
+  Our model:
+    Female               FPR = 0.02  (n=1726)
+    Male                 FPR = 0.08  (n=2838)
+
+Final model: adaboost refit on all 6000 development rows.
+Features kept: 8 of 38: numeric__age, numeric__education_num, numeric__capital_gain, numeric__capital_loss, numeric__hours_per_week, categorical__marital_status, categorical__occupation, categorical__relationship
+
+Scoreboard:
+            run                  model  tuned feature_selection  roc_auc   std  untuned  floor
+20261113_141954 hist_gradient_boosting   True       min_votes 2    0.914 0.009    0.910  0.500
+20261113_135832                xgboost   True       min_votes 1    0.911 0.012    0.904  0.500
+20261113_143231      gradient_boosting   True       min_votes 1    0.910 0.010    0.912  0.500
+20261113_125240 hist_gradient_boosting  False       min_votes 2    0.910 0.009    0.910  0.500
+20261113_144906               adaboost   True       min_votes 2    0.909 0.012    0.901  0.500

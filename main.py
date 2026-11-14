@@ -8,13 +8,21 @@ This orchestrates the full (deliberately simple) pipeline:
     load config -> load data -> preprocess -> split -> train
     -> evaluate (train & test) -> save results
 """
+import os
+import warnings
+os.environ["PYTHONWARNINGS"] = "ignore"
+warnings.filterwarnings("ignore")
+warnings.simplefilter("ignore")
+
 from datetime import datetime
 import shutil
 import tempfile
+import pandas as pd
 import numpy as np
 
 import optuna
 import yaml
+import sys
 from sklearn.model_selection import StratifiedKFold
 from src.data import load_data
 from src.preprocessing import add_engineered_features, clean_dataset, drop_duplicate_rows, split_features_target, split_dev_test
@@ -24,8 +32,10 @@ from src.tuning import tune_pipeline, nested_cross_validate, tuning_report
 from src.results import save_run, save_scores
 
 
-def load_config(path: str = "config.yaml") -> dict:
-    with open(path, "r") as f:
+def load_config() -> dict:
+    # usa "config.yaml" por defeito
+    config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
+    with open(config_path, "r") as f:
         return yaml.safe_load(f)
 
 
@@ -33,26 +43,42 @@ def main():
     config = load_config()
     run = datetime.now().strftime("%Y%m%d_%H%M%S")
     model_type = config["model"]["type"]
+
+    train_path = config["data"].get("train_path") or config["data"]["path"]
+    test_path = config["data"].get("test_path")
     
-    df = load_data(config["data"]["path"])
+    df = load_data(train_path)
     df_clean = clean_dataset(df, config["diagnostics"])
-    df_clean = drop_duplicate_rows(df_clean, id_column=config["data"].get("id_column"))
+    df_clean = drop_duplicate_rows(df_clean, id_column=config["data"].get("id_column")) # only on train
 
     print(df_clean.columns.tolist())
 
-    df_clean = add_engineered_features(df_clean)
+    if config["preprocessing"].get("add_engineered_features", False):
+       df_clean = add_engineered_features(df_clean)
 
     mnar_sources = config["preprocessing"].get("mnar_indicator_sources", [])
     X, y, extras = split_features_target(df_clean, config["data"], mnar_sources)
 
-    # week 4: the final test set is set aside HERE and never used again in this script.
+    if test_path:
+    # Adult Income (2 files) 
+        X_dev, y_dev, extras_dev = X, y, extras
+        df_test = load_data(test_path)
+        df_test_clean = clean_dataset(df_test, config["diagnostics"])
+        # split_features_target returns (X, y, extras). 
+        # adult_new.csv does not have the target column, y_test will be automatically None.
+        X_test, y_test, extras_test = split_features_target(df_test_clean, config["data"], mnar_sources)
+    
+    else:
+    # COMPAS (1 file)
+     # week 4: the final test set is set aside HERE and never used again in this script.
     # Every decision from now on (preprocessing, model, hyperparameters) is made on the
     # development set only. The test set is used only for the final assessment.
-    X_dev, X_test, y_dev, y_test, extras_dev, extras_test = split_dev_test(
-        X, y, extras,
-        test_size=config["split"]["test_size"],
-        random_state=config["split"]["random_state"],
-    )
+        X_dev, X_test, y_dev, y_test, extras_dev, extras_test = split_dev_test(
+            X, y, extras,
+            test_size=config["split"]["test_size"],
+            random_state=config["split"]["random_state"],
+        )
+
 
     cv_config = config["cv"]
     shuffle = cv_config.get("shuffle", True)
@@ -132,13 +158,33 @@ def main():
 
     pipeline.fit(X_dev, y_dev)
     refit = f"Final model: {model_type} refit on all {len(X_dev)} development rows."
+
+    # For Adult Income Dataset prediction:
+    if test_path and y_test is None:
+        y_test_proba = pipeline.predict_proba(X_test)[:, 1]
+        y_test_pred = (y_test_proba >= 0.5).astype(int)
+
+        id_col = config["diagnostics"].get("id_column", "id")
+        test_ids = df_test[id_col].values if id_col in df_test.columns else df_test.index
+
+        predictions_df = pd.DataFrame({
+            "id": test_ids,
+            "probability": y_test_proba,
+            "prediction": y_test_pred,
+        })
+        results_dir = config.get("output", {}).get("results_dir", "results")
+        os.makedirs(results_dir, exist_ok=True)
+        pred_file = f"{results_dir}/predictions.csv"
+        predictions_df.to_csv(f"{results_dir}/predictions_{run}_{model_type}.csv", index=False)
+        print(f"Predictions saved to '{pred_file}' ({len(predictions_df)} rows).")
+
     if selection_enabled:
        all_features = pipeline.named_steps["prep"].get_feature_names_out()
        kept = pipeline.named_steps["select"].get_feature_names_out(all_features)
        refit += f"\nFeatures kept: {len(kept)} of {len(all_features)}: {', '.join(kept)}"
     report += "\n" + refit + "\n"
 
-    row = {"run": run, "data": config["data"]["path"], "model": model_type, "tuned": tuning_enabled,
+    row = {"run": run, "data": train_path, "model": model_type, "tuned": tuning_enabled,
            "encoder": config["preprocessing"]["encoder"], "scaler": config["preprocessing"]["scaler"],
            "feature_selection": (f"min_votes {pipeline.named_steps['select'].min_votes}" if selection_enabled else "off"),
            "params": str(config["model"].get("params")), "tuned_params": str(study.best_params) if tuning_enabled else "",

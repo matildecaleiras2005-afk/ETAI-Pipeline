@@ -1,0 +1,104 @@
+Run: 20261113_141954
+Model: hist_gradient_boosting  params={'max_iter': 100, 'random_state': 42}
+Preprocessing: encoder=target  scaler=robust
+CV: 5 stratified folds  shuffle=True  random_state=42
+Metrics: ['accuracy', 'balanced_accuracy', 'precision', 'recall', 'f1', 'fbeta_2', 'roc_auc', 'average_precision']  selection metric: roc_auc
+Feature selection: VoteSelector, min_votes=2 (before tuning)
+Tuning: Optuna, 30 trials x 5 folds, nested CV  random_state=42
+Locked test set: size=0.2  random_state=42  (not evaluated)
+============================================================
+
+Hyperparameters from config.yaml: {'max_iter': 100, 'random_state': 42}
+
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.955       0.917 0.038     0.875              0.802      0.782   0.662 0.717    0.683    0.917              0.813
+    2  0.952       0.908 0.045     0.850              0.769      0.718   0.613 0.662    0.632    0.908              0.781
+    3  0.956       0.909 0.047     0.866              0.777      0.784   0.606 0.684    0.635    0.909              0.799
+    4  0.954       0.919 0.034     0.871              0.792      0.780   0.641 0.704    0.665    0.919              0.816
+    5  0.958       0.896 0.061     0.847              0.757      0.724   0.583 0.646    0.607    0.896              0.776
+
+                   mean   std
+accuracy          0.862 0.013
+balanced_accuracy 0.779 0.018
+precision         0.758 0.033
+recall            0.621 0.031
+f1                0.682 0.029
+fbeta_2           0.644 0.030
+roc_auc           0.910 0.009
+average_precision 0.797 0.018
+
+roc_auc: train-validation gap mean = +0.045
+
+No-model floor (dummy, same folds): roc_auc = 0.500
+
+Nested cross-validation (the tuning procedure, estimated honestly) (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation    gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision  inner_best  model__max_iter  model__learning_rate  model__max_leaf_nodes  model__min_samples_leaf  model__l2_regularization  select__min_votes
+    1  0.932       0.917  0.015     0.868              0.795      0.761   0.655 0.704    0.674    0.917              0.818       0.909              130                 0.491                      3                        9                     0.133                  1
+    2  0.928       0.916  0.012     0.861              0.775      0.761   0.610 0.677    0.635    0.916              0.800       0.912              328                 0.164                      3                        5                     0.559                  2
+    3  0.937       0.910  0.027     0.861              0.764      0.783   0.578 0.665    0.610    0.910              0.799       0.914              279                 0.129                      5                        6                     1.340                  2
+    4  0.918       0.925 -0.007     0.868              0.782      0.787   0.617 0.691    0.645    0.925              0.824       0.908              297                 0.491                      2                       25                     0.003                  1
+    5  0.926       0.900  0.026     0.857              0.769      0.752   0.601 0.668    0.626    0.900              0.779       0.915              388                 0.412                      2                       14                     0.043                  1
+
+                   mean   std
+accuracy          0.863 0.005
+balanced_accuracy 0.777 0.012
+precision         0.769 0.015
+recall            0.612 0.028
+f1                0.681 0.016
+fbeta_2           0.638 0.024
+roc_auc           0.914 0.009
+average_precision 0.804 0.018
+
+roc_auc: train-validation gap mean = +0.015
+
+Tuning on the whole development set (30 Optuna trials, metric: roc_auc)
+Best hyperparameters: {'model__max_iter': 279, 'model__learning_rate': 0.12870156579680161, 'model__max_leaf_nodes': 5, 'model__min_samples_leaf': 6, 'model__l2_regularization': 1.340495141159599, 'select__min_votes': 2}
+Best mean CV score:   0.914  (the maximum over all trials -- optimistic)
+
+Top 5 trials:
+ trial  mean roc_auc  model__l2_regularization  model__learning_rate  model__max_iter  model__max_leaf_nodes  model__min_samples_leaf  select__min_votes   std
+    20         0.914                     1.340                 0.129              279                      5                        6                  2 0.010
+    22         0.914                     1.179                 0.076              351                      6                       10                  2 0.010
+    26         0.914                     6.232                 0.075              268                      8                        8                  2 0.009
+    24         0.913                     5.529                 0.058              318                      7                        6                  2 0.010
+    25         0.913                     0.028                 0.113              285                      5                        7                  2 0.010
+
+Optimism check (nested CV):
+  tuning score inside the outer folds (inner_best) mean = 0.912
+  honest score on the outer folds (validation)     mean = 0.914
+  optimism = -0.002   -> report the honest one
+
+Out-of-fold predictions, development set (threshold 0.5):
+
+        predicted 0  predicted 1
+true 0         4299          265
+true 1          557          879
+
+              precision    recall  f1-score   support
+
+           0       0.89      0.94      0.91      4564
+           1       0.77      0.61      0.68      1436
+
+    accuracy                           0.86      6000
+   macro avg       0.83      0.78      0.80      6000
+weighted avg       0.86      0.86      0.86      6000
+
+False positive rate by sex (development set, out-of-fold)
+(share of people who did NOT reoffend, but were predicted to)
+
+  Our model:
+    Female               FPR = 0.02  (n=1726)
+    Male                 FPR = 0.08  (n=2838)
+
+Final model: hist_gradient_boosting refit on all 6000 development rows.
+Features kept: 8 of 38: numeric__age, numeric__education_num, numeric__capital_gain, numeric__capital_loss, numeric__hours_per_week, categorical__marital_status, categorical__occupation, categorical__relationship
+
+Scoreboard:
+            run                  model  tuned feature_selection  roc_auc   std  untuned  floor
+20261113_125422 hist_gradient_boosting   True       min_votes 2    0.914 0.009    0.910  0.500
+20261113_141954 hist_gradient_boosting   True       min_votes 2    0.914 0.009    0.910  0.500
+20261113_135832                xgboost   True       min_votes 1    0.911 0.012    0.904  0.500
+20261113_125240 hist_gradient_boosting  False       min_votes 2    0.910 0.009    0.910  0.500
