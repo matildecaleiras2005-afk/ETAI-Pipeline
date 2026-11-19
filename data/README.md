@@ -360,3 +360,66 @@ Conclusions:
 - It was possible to hit the target scores thanks to: the robust target encoding for categorical variables with lots of categories, and tuning the Hist Gradient Boosting model using nested cross-validation. On top of that, feature selection successfully got rid of useless noise, allowing the model to focus purely on what actually matters for predicting income.
 
 - Predictions for `adult_new.csv` were saved with exactly 2,000 rows containing `id`, `probability`, and `prediction` in `results_adult/predictions_{model}.csv`.
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-> CLASS - WEEK 10 
+
+Scoreboard (runs on the same data and metric; best first)
+            run                  model  tuned       imputer feature_selection  roc_auc   std  untuned  floor
+20261119_110438      gradient_boosting  False        median       min_votes 2    0.723 0.013    0.723  0.500
+20261119_111127      gradient_boosting  False     iterative       min_votes 2    0.722 0.011    0.722  0.500
+20261119_111029      gradient_boosting  False           knn       min_votes 2    0.722 0.010    0.722  0.500
+20261119_111434      gradient_boosting  False random_forest       min_votes 2    0.720 0.012    0.720  0.500
+
+Imputer Comparison: GradientBoosting - KNN vs Median
+Mean Difference: -0.0008
+Wins: 2/5
+t-statistic: -0.5230
+p-value: 0.6286
+----------------------------------------
+Imputer Comparison: GradientBoosting - Iterative vs Median
+Mean Difference: -0.0008
+Wins: 1/5
+t-statistic: -0.4995
+p-value: 0.6436
+----------------------------------------
+Imputer Comparison: GradientBoosting - Random Forest vs Median
+Mean Difference: -0.0032
+Wins: 0/5
+t-statistic: -1.2039
+p-value: 0.2950
+----------------------------------------
+
+Conclusions:
+
+- Since tuning wasn't mandatory, I chose gradient_boosting, as it had been my best untuned model so far.
+
+- All four imputation strategies scored between 0.720 and 0.723 ROC-AUC compared to the 0.5 baseline. In the corrected paired t-tests against median, none of the more complex methods beat it: knn (-0.0008, p = 0.6286), iterative (-0.0008, p = 0.6436), and random_forest (-0.0032, p = 0.2950) all showed small negative differences with no statistical significance. 
+
+- So, I decide to keep median because it achieved the highest mean ROC-AUC (0.723) while staying fast, simple, and free of unnecessary computational overhead.
+
+- Command to get predictions: python predict.py data/compas_new_people.csv predictions.csv. And It contains exactly 20 rows with id, probability and predictions:
+
+id,probability,prediction
+900001,0.4422095259406187,0
+900002,0.2859004596517529,0
+900003,0.3364652144345525,0
+900004,0.49114438761844287,0
+900005,0.37532732282800235,0
+900006,0.6622890845379352,1
+900007,0.3856072435612667,0
+900008,0.5201656504300379,1
+900009,0.18434116725120606,0
+900010,0.32438682368293226,0
+900011,0.20154336051353794,0
+900012,0.8947453503988884,1
+900013,0.4556173973413898,0
+900014,0.7485926274220688,1
+900015,0.43633120551214843,0
+900016,0.43633120551214843,0
+900017,0.7427114923606175,1
+900018,0.28519695049895216,0
+900019,0.396928554645407,0
+900020,0.4047189895341627,0
+

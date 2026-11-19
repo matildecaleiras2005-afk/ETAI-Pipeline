@@ -12,12 +12,13 @@ split:
   random_state: 42
 
 model:
-  type: "hist_gradient_boosting"  # placeholder; replaced by the actual model type in the config file for each run
-  params: {'max_iter': 100, 'random_state': 42}
+  type: "gradient_boosting"  # placeholder; replaced by the actual model type in the config file for each run
+  params: {'n_estimators': 100, 'random_state': 42}
 
 output:
   results_dir: "results"   # each run's full report is saved here as a timestamped .txt file
   scoreboard: "results/runs.csv"
+  model_path: "models/model.joblib" 
 
 diagnostics:
   placeholder_tokens: ["-", "?", "n/a", "N/A", "na", "NA", ""]
@@ -67,10 +68,13 @@ preprocessing:
   mnar_indicator_sources: ["priors_count", "c_charge_degree"]
   # seed for the target encoder's internal cross-fitting (week 4: sklearn's TargetEncoder)
   random_state: 42
-  imputation:
-    numeric_strategy: "median"        # applies to age, juv_fel_count, juv_misd_count, juv_other_count, priors_count
-    categorical_strategy: "most_frequent"   # applies to sex, age_cat, c_charge_degree
   add_engineered_features: true
+  imputation:
+    numeric_strategy: "median"                    
+    categorical_strategy: "most_frequent"
+    n_neighbors: 5                                  
+    max_iter: 10                                   
+    n_estimators: 50                                
 
 cv:
   n_splits: 5
@@ -82,7 +86,7 @@ cv:
   selection_metric: "roc_auc"
 
 tuning:
- enabled: true
+ enabled: false
  n_trials: 30
  n_splits: 5                                       # folds that score each candidate
  random_state: 42                                  # seeds the sampler and those folds
